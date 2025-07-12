@@ -44,7 +44,27 @@ const photographerSlice = createSlice({
 
         return matchPrice && matchRating && matchStyles && matchCity;
       });
-    }
+    },
+
+    applySorting: (state, action) => {
+  const sortType = action.payload;
+  const sorted = [...state.filteredList];
+
+  if (sortType === 'priceAsc') {
+    sorted.sort((a, b) => a.price - b.price);
+  } else if (sortType === 'ratingDesc') {
+    sorted.sort((a, b) => b.rating - a.rating);
+  } else if (sortType === 'recent') {
+    sorted.sort((a, b) => b.id - a.id); // higher ID = newer
+  }
+
+  state.filteredList = sorted;
+}
+
+
+
+
+
   },
   extraReducers: (builder) => {
     builder
@@ -63,8 +83,9 @@ const photographerSlice = createSlice({
   },
 });
 
+export const { setSearchQuery, applyFilters, applySorting } = photographerSlice.actions;
 
-export const { setSearchQuery, applyFilters } = photographerSlice.actions;
+ 
 
 
 export default photographerSlice.reducer;

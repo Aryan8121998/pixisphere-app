@@ -5,6 +5,8 @@ import PhotographerCard from '../components/PhotographerCard';
 import { Grid, Typography, CircularProgress, Container,Box } from '@mui/material';
 import SearchBar from '../components/SearchBar';
 import FilterSidebar from '../components/FilterSidebar';
+import SortDropdown from '../components/SortDropdown';
+
 
 const ListingPage = () => {
   const dispatch = useDispatch();
@@ -20,7 +22,10 @@ const ListingPage = () => {
       Maternity Photographers in Bengaluru
     </Typography>
 
+    
     <SearchBar />
+    <SortDropdown />
+
 
     <Box sx={{ display: 'flex', gap: 4 }}>
       <Box sx={{ width: 250 }}>
