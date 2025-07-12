@@ -4,8 +4,9 @@ import axios from 'axios';
 export const fetchPhotographers = createAsyncThunk(
   'photographers/fetchPhotographers',
   async () => {
-    const response = await axios.get('http://localhost:3001/photographers');
-    return response.data;
+   const response = await axios.get('/data/photographers.json');
+return response.data.photographers; 
+
   }
 );
 
