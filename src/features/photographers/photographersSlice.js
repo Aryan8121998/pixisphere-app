@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-
 export const fetchPhotographers = createAsyncThunk(
   'photographers/fetchPhotographers',
   async () => {
@@ -10,15 +9,18 @@ export const fetchPhotographers = createAsyncThunk(
   }
 );
 
+const initialState = {
+  list: [],
+  filteredList: [],
+  searchQuery: '',
+  visibleCount: 2,
+  status: 'idle',
+  error: null,
+};
+
 const photographerSlice = createSlice({
   name: 'photographers',
-  initialState: {
-    list: [],
-    filteredList: [],
-    searchQuery: '',
-    status: 'idle',
-    error: null,
-  },
+  initialState,
   reducers: {
     setSearchQuery: (state, action) => {
       const query = action.payload.toLowerCase();
@@ -47,25 +49,25 @@ const photographerSlice = createSlice({
     },
 
     applySorting: (state, action) => {
-  const sortType = action.payload;
-  const sorted = [...state.filteredList];
+      const sortType = action.payload;
+      const sorted = [...state.filteredList];
 
-  if (sortType === 'priceAsc') {
-    sorted.sort((a, b) => a.price - b.price);
-  } else if (sortType === 'ratingDesc') {
-    sorted.sort((a, b) => b.rating - a.rating);
-  } else if (sortType === 'recent') {
-    sorted.sort((a, b) => b.id - a.id); // higher ID = newer
-  }
+      if (sortType === 'priceAsc') {
+        sorted.sort((a, b) => a.price - b.price);
+      } else if (sortType === 'ratingDesc') {
+        sorted.sort((a, b) => b.rating - a.rating);
+      } else if (sortType === 'recent') {
+        sorted.sort((a, b) => b.id - a.id); // higher ID = newer
+      }
 
-  state.filteredList = sorted;
-}
+      state.filteredList = sorted;
+    },
 
-
-
-
-
+    increaseVisibleCount: (state) => {
+      state.visibleCount += 6;
+    },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchPhotographers.pending, (state) => {
@@ -83,9 +85,11 @@ const photographerSlice = createSlice({
   },
 });
 
-export const { setSearchQuery, applyFilters, applySorting } = photographerSlice.actions;
-
- 
-
+export const {
+  setSearchQuery,
+  applyFilters,
+  applySorting,
+  increaseVisibleCount,
+} = photographerSlice.actions;
 
 export default photographerSlice.reducer;
