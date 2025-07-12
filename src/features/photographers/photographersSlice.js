@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+
 export const fetchPhotographers = createAsyncThunk(
   'photographers/fetchPhotographers',
   async () => {
@@ -12,45 +13,58 @@ export const fetchPhotographers = createAsyncThunk(
 const photographerSlice = createSlice({
   name: 'photographers',
   initialState: {
-  list: [],
-  filteredList: [],
-  searchQuery: '',
-  status: 'idle',
-  error: null,
-},
-  reducers: {
-     setSearchQuery: (state, action) => {
-    const query = action.payload.toLowerCase();
-    state.searchQuery = query;
-
-    state.filteredList = state.list.filter((p) => {
-      return (
-        p.name.toLowerCase().includes(query) ||
-        p.location.toLowerCase().includes(query) ||
-        p.tags.some(tag => tag.toLowerCase().includes(query))
-      );
-    });
+    list: [],
+    filteredList: [],
+    searchQuery: '',
+    status: 'idle',
+    error: null,
   },
+  reducers: {
+    setSearchQuery: (state, action) => {
+      const query = action.payload.toLowerCase();
+      state.searchQuery = query;
+
+      state.filteredList = state.list.filter((p) => {
+        return (
+          p.name.toLowerCase().includes(query) ||
+          p.location.toLowerCase().includes(query) ||
+          p.tags.some(tag => tag.toLowerCase().includes(query))
+        );
+      });
+    },
+
+    applyFilters: (state, action) => {
+      const { price, ratings, styles, city } = action.payload;
+
+      state.filteredList = state.list.filter((p) => {
+        const matchPrice = p.price >= price[0] && p.price <= price[1];
+        const matchRating = ratings.length ? ratings.some(r => p.rating >= r) : true;
+        const matchStyles = styles.length ? styles.some(style => p.styles.includes(style)) : true;
+        const matchCity = city ? p.location === city : true;
+
+        return matchPrice && matchRating && matchStyles && matchCity;
+      });
+    }
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchPhotographers.pending, (state) => {
         state.status = 'loading';
       })
+      .addCase(fetchPhotographers.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.list = action.payload;
+        state.filteredList = action.payload;
+      })
       .addCase(fetchPhotographers.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
-      })
-      .addCase(fetchPhotographers.fulfilled, (state, action) => {
-  state.status = 'succeeded';
-  state.list = action.payload;
-  state.filteredList = action.payload; // <- use this to filter
-});
-;
+      });
   },
 });
 
-export const { setSearchQuery } = photographerSlice.actions;
+
+export const { setSearchQuery, applyFilters } = photographerSlice.actions;
+
+
 export default photographerSlice.reducer;
-
-
